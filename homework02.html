@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+              crossorigin="anonymous">
+        <link href="https://fonts.googleapis.com/css?family=Stylish&amp;display=swap" rel="stylesheet">
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+                integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+                crossorigin="anonymous"></script>
+        <meta charset="UTF-8">
+        <title>homework02</title>
+
+        <script>
+            $(document).ready(function () {
+                showExchange();
+            });
+
+            function orderSubmit() {
+                let orderName = $('#orderName').val();
+                let orderCount = $('#orderCount').val();
+                let address = $('#address').val();
+                let phoneNumber = $('#phoneNumber').val();
+                if (orderName == '') {
+                    alert('이름을 입력하세요.')
+                    return;
+                } else if (orderCount == '') {
+                    alert('수량을 선택하세요.')
+                    return;
+                } else if (address == '') {
+                    alert('주소를 입력하세요.')
+                    return;
+                } else if (phoneNumber == '') {
+                    alert('전화번호를 입력하세요.')
+                    return;
+                } else {
+                    alert('주문이 완료되었습니다!')
+                }
+            }
+
+            function showExchange() {
+                $.ajax({
+                    type: "GET",
+                    url: "https://api.manana.kr/exchange/rate.json",
+                    data: {},
+                    success: function (response) {
+                        for (let i = 0; i < response.length; i++) {
+                            let name = response[i]["name"];
+                            let rate = response[i]["rate"];
+                            if (name == "USDKRW=X") {
+                                $('#exchange').text(rate);
+                                return;
+                            }
+                        }
+                    }
+                })
+            }
+        </script>
+
+        <style>
+            * {
+                font-family: 'Stylish', sans-serif;
+            }
+
+            .image {
+                max-width: 300px;
+                height: 550px;
+                margin: auto;
+                background-position: center;
+                /*padding-top: 10px;*/
+            }
+
+            .wrap {
+                max-width: 700px;
+                margin: auto;
+                padding-bottom: 10px;
+            }
+
+            .order {
+                max-width: 700px;
+                margin: auto;
+            }
+
+            .input-group {
+                border-radius: 5px;
+            }
+
+            .btn-primary {
+                color: white;
+                border-radius: 5px;
+                margin: auto auto auto 300px;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+
+            .exchange {
+                color: blue;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="image">
+            <img src="https://pbs.twimg.com/media/EaRazCwU0AAzCH9?format=jpg&name=large" height="550" width="300">
+        </div>
+        <div class="wrap">
+            <h1>
+                공기청정기 팝니다 <span style="font-size: 20px">가격: 500,000원/개</span>
+            </h1>
+            <h4>
+                이 최신식 공기청정기는 집안 공기를 숲속처럼 바꿔주고, 원한다면 DVD 재생, Netflix도 시청할 수 있게 해주는 기기입니다.
+                당신의 집에 꼭 필요한 이 공기청정기를 구매하세요!!
+            </h4>
+            <div class="exchange">
+                달러-원 환율:
+                <span id="exchange"> </span>
+            </div>
+        </div>
+        <div class="order">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">주문자 이름</span>
+                </div>
+                <input type="text" class="form-control" id="orderName" aria-describedby="basic-addon3">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text">수량</label>
+                </div>
+                <select class="custom-select" id="orderCount">
+                    <option selecte value="">-- 수량을 선택하세요 --</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">주소</span>
+                </div>
+                <input type="text" class="form-control" id="address" aria-describedby="basic-addon3">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">전화번호</span>
+                </div>
+                <input type="text" class="form-control" id="phoneNumber" aria-describedby="basic-addon3">
+            </div>
+            <button onclick="orderSubmit()" type="button" class="btn btn-primary">주문하기</button>
+        </div>
+    </body>
+</html>
