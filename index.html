@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <!-- Webpage Title -->
+        <title>나홀로 쇼핑몰</title>
+
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+              crossorigin="anonymous">
+
+        <!-- JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                crossorigin="anonymous"></script>
+
+        <!-- 구글폰트 -->
+        <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+        <title>homework04</title>
+
+        <script>
+            $(document).ready(function () {
+                showExchange();
+                $('#orders-box').html("");
+                showOrders();
+            });
+
+            function showExchange() {
+                $.ajax({
+                    type: "GET",
+                    url: "https://api.manana.kr/exchange/rate.json",
+                    data: {},
+                    success: function (response) {
+                        for (let i = 0; i < response.length; i++) {
+                            let name = response[i]["name"];
+                            let rate = response[i]["rate"];
+                            if (name == "USDKRW=X") {
+                                $('#exchange').text(rate);
+                                return;
+                            }
+                        }
+                    }
+                })
+            }
+
+            function orderSubmit() {
+                let orderName = $('#orderName').val();
+                let orderCount = $('#orderCount').val();
+                let address = $('#address').val();
+                let phoneNumber = $('#phoneNumber').val();
+                if (orderName == '') {
+                    alert('이름을 입력하세요.')
+                    return;
+                } else if (orderCount == '') {
+                    alert('수량을 선택하세요.')
+                    return;
+                } else if (address == '') {
+                    alert('주소를 입력하세요.')
+                    return;
+                } else if (phoneNumber == '') {
+                    alert('전화번호를 입력하세요.')
+                    return;
+                } else {
+                    alert('주문이 완료되었습니다!')
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/order",
+                    data: {
+                        "name_give": orderName,
+                        "count_give": orderCount,
+                        "address_give": address,
+                        "phone_give": phoneNumber
+                    }, // client (크롬) 에서 보낸 데이터를 여기에 저장해서 DB로 보내는 것
+                    success: function (response) {
+                        if (response["result"] == "success") {
+                            // alert(response["msg"]);
+                            window.location.reload();
+                        }
+                    }
+                })
+            }
+
+            function showOrders() {
+                $.ajax({
+                    type: "GET",
+                    url: "/order",
+                    data: {},
+                    success: function (response) {
+                        if (response["result"] == "success") {
+                            let order_receive = response['orders']
+                            let orderRender = '';
+                            for (let i = 0; i < order_receive.length; i++) {
+                                let order = order_receive[i];
+                                let name = order['name'];
+                                let count = order['count'];
+                                let address = order['address'];
+                                let phone = order['phone'];
+                                orderRender += `<tr>
+                                    <td>${name}</td>
+                                    <td>${count}</td>
+                                    <td>${address}</td>
+                                    <td>${phone}</td>
+                                  </tr>`
+                                $("#orders-box").html(tempHtml);
+                            }
+                        }
+                    }
+                })
+            }
+        </script>
+
+        <style>
+            * {
+                font-family: 'Stylish', sans-serif;
+            }
+
+            .image {
+                max-width: 300px;
+                height: 550px;
+                margin: auto;
+                background-position: center;
+                /*padding-top: 10px;*/
+            }
+
+            .wrap {
+                max-width: 700px;
+                margin: auto;
+                padding-bottom: 10px;
+            }
+
+            .order {
+                max-width: 700px;
+                margin: auto;
+            }
+
+            .input-group {
+                border-radius: 5px;
+            }
+
+            .btn-primary {
+                color: white;
+                border-radius: 5px;
+                margin: auto auto auto 300px;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+
+            .exchange {
+                color: blue;
+            }
+
+            .orders {
+                margin: auto;
+                max-width: 700px;
+                margin-top: 100px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="image">
+            <img src="https://pbs.twimg.com/media/EaRazCwU0AAzCH9?format=jpg&name=large" height="550" width="300">
+        </div>
+        <div class="wrap">
+            <h1>
+                공기청정기 팝니다 <span style="font-size: 20px">가격: 500,000원/개</span>
+            </h1>
+            <h4>
+                이 최신식 공기청정기는 집안 공기를 숲속처럼 바꿔주고, 원한다면 DVD 재생, Netflix도 시청할 수 있게 해주는 기기입니다.
+                당신의 집에 꼭 필요한 이 공기청정기를 구매하세요!!
+            </h4>
+            <div class="exchange">
+                달러-원 환율:
+                <span id="exchange"> </span>
+            </div>
+        </div>
+        <div class="order">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">주문자 이름</span>
+                </div>
+                <input type="text" class="form-control" id="orderName" aria-describedby="basic-addon3">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text">수량</label>
+                </div>
+                <select class="custom-select" id="orderCount">
+                    <option selecte value="">-- 수량을 선택하세요 --</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">주소</span>
+                </div>
+                <input type="text" class="form-control" id="address" aria-describedby="basic-addon3">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">전화번호</span>
+                </div>
+                <input type="text" class="form-control" id="phoneNumber" aria-describedby="basic-addon3">
+            </div>
+            <button onclick="orderSubmit()" type="button" class="btn btn-primary">주문하기</button>
+        </div>
+        <div class="orders">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">이름</th>
+                        <th scope="col">수량</th>
+                        <th scope="col">주소</th>
+                        <th scope="col">전화번호</th>
+                    </tr>
+                    </thead>
+                    <tbody id="orders-box">
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+        </div>
+    </body>
+</html>
